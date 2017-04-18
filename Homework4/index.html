@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8">
+<title>Homework 4</title>
+</head>
+<style>
+table,th,td {
+  border : 1px solid black;
+  border-collapse: collapse;
+}
+th,td {
+  padding: 5px;
+}
+</style>
+<body>
+<center>
+<div id="mainbody">
+<h1>Enter URL for Airlines List XML File</h1>
+<input type="text" id="getname"></input><br/><br/>
+<button type="button" onclick="loadXMLDoc()">Submit Query</button>
+</div>
+</center>
+<br><br>
+
+<script>
+function loadXMLDoc() {
+	var name=document.getElementById("getname").value;
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4) {
+      if(this.status==200)
+        getXMLData(this);
+    if(this.status==404)
+        window.alert("File Not Found");
+    }
+  };
+  xmlhttp.open("GET", name, false);
+  try{
+    xmlhttp.send();
+  }
+  catch(e){
+    window.alert("File Not Found");
+  }
+}
+
+function getXMLData(xml) {
+  var i;
+  var invalid;
+  try{
+    var xmlDoc = xml.responseXML;
+  }
+  catch(e){
+  }
+  if(xmlDoc==null){
+    window.alert("Error in XML File");
+    invalid=1;
+  }
+  else{
+    var table='<html><head><title>XML ParseList</title><style>table,th,td {  border : 1px solid black;  }th,td {  padding: 5px;}</style></head><body><center><h1> Airline List </h1><center><table><tr>';
+    x = xmlDoc.getElementsByTagName('Data');
+      
+    for (i =0 ; i<x.length; i++) 
+      {
+          table += "<th>"+x[i].childNodes[0].nodeValue+"</th>";
+      }
+    table+="</tr>"
+    x=xmlDoc.getElementsByTagName("Row");
+    if(x.length==0)
+      window.alert("Contains only Header and No Data");
+    else{
+        for(i=0;i<x.length;i++){
+          table+="<tr><td>";
+          table+=x[i].getElementsByTagName("Airline")[0].innerHTML;
+          table+="</td>";
+          table+="<td>";
+          table+=x[i].getElementsByTagName("IATA")[0].innerHTML;
+          table+="</td>";
+          table+="<td>";
+          //table+=x[i].getElementsByTagName("Hubs")[0].innerHTML;
+          var temp="";
+          var y=x[i].getElementsByTagName("Hubs");
+          var z=y[0].getElementsByTagName("Hub");
+          temp+="<ul>"
+          for(var j=0;j<z.length;j++){
+            if(j==0){
+                temp+="<li><b>"+z[j].innerHTML+"</b></li>";   
+            }
+            else
+              temp+="<li>"+z[j].innerHTML+"</li>";
+          }
+          temp+="</ul>"
+          table+=temp;
+          table+="</td>";
+          table+="<td>";
+          table+=x[i].getElementsByTagName("Notes")[0].innerHTML;
+          table+="</td>";
+          table+="<td><a href='";
+          table+=x[i].getElementsByTagName("HomePage")[0].innerHTML;
+          table+="'>"+x[i].getElementsByTagName("HomePage")[0].innerHTML+"</td>";
+          table+="<td><img src='";
+          table+=x[i].getElementsByTagName("Plane")[0].innerHTML;
+          table+="' width='100%'></td>";
+          table+="</td></tr>";
+        }
+        table+="</table></body></html>"
+        myWindow=window.open('about_blank','','width=600,height=400');
+        myWindow.document.write(table);
+        myWindow.focus();
+    }
+
+
+
+
+
+
+}
+}
+
+
+
+
+
+
+</script>
+
+</body>
+</html>

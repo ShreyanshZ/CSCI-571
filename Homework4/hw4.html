@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<style>
+			table,th,td {
+				border : 1px solid black;
+				border-collapse: collapse;
+			}
+			th,td {
+				padding: 5px;
+			}
+		</style>
+	</head>
+	<body>
+		<form onsubmit="loadXML()">
+			<input type="text" id="getname"></input><br/>
+			<input type="submit" value="Submit">
+		</form>
+		<p id="demo"></p>
+			<script type="text/javascript">
+				var xmlDoc;
+				var test="";
+				function loadXML(){
+					var x = document.getElementById("getname").value;
+					loadXMLdemo(x);
+				}
+				function loadXMLdemo(url) {
+					var xmlhttp=new XMLHttpRequest();
+					xmlhttp.onreadystatechange = function() {
+						if (this.readyState == 4) {
+						  	if(this.status==0)
+						    	window.alert("Wrong File");
+							else if(this.status==200){
+								document.write("Hello");
+						    	myFunction(this);}
+						}
+					};
+					xmlhttp.open("GET",url,true); //open, send, responseXML are
+					xmlhttp.send(); //properties of XMLHTTPRequest
+				}
+
+				function myFunction(xml){
+				xmlDoc=xml.responseXML;
+					
+					var table='<html><style>table,th,td {  border : 1px solid black;  }th,td {  padding: 5px;}</style><body><table id="demo"><tr><th>Artist</th><th>Title</th></tr>';
+					var x = xmlDoc.getElementsByTagName("CD");
+					for (i = 0; i <x.length; i++) { 
+					    table += "<tr><td>" +
+					    x[i].getElementsByTagName("ARTIST")[0].childNodes[0].nodeValue +
+					    "</td><td>" +
+					    x[i].getElementsByTagName("TITLE")[0].childNodes[0].nodeValue +
+					    "</td></tr>";
+					}
+					table+="</table>"
+					window.open("", "", "width=500,height=500").document.write(table);
+
+				}
+			</script>
+</body></html>

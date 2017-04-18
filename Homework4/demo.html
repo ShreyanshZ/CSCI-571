@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<p>An unordered list:</p>
+<ul>
+  <li>
+  	<a>Hahah</a>
+    <a>Hahah</a>
+    <a>Hahah</a>
+  </li>
+  <li>Tea</li>
+  <li>Milk</li>
+</ul>
+
+<p>Click the button to display the innerHTML of the second li element (index 1).</p>
+
+<button onclick="myFunction()">Try it</button>
+
+<p id="demo"></p>
+
+<script>
+function myFunction() {
+    var x = document.getElementsByTagName("ul");
+    if(x==null)
+    	window.alert("Hahaha");
+    else
+    document.getElementById("demo").innerHTML = x.length;
+}
+</script>
+
+</body>
+</html>

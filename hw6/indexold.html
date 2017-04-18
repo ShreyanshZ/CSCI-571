@@ -1,0 +1,58 @@
+<!Doctype html>
+
+<html>
+    <head>
+    
+    <script>
+        function showDiv(elem){
+            if(elem){
+                console.log(elem);
+                locValue = document.getElementById("loc").value;
+                if(elem.value ==locValue   ){
+                    document.getElementById('hidden_div').style.display = "block";
+                    document.getElementById('placevalue').required=true;
+                    document.getElementById('distancevalue').required=true;
+                }
+                else{
+                    document.getElementById('hidden_div').style.display = "none";
+                    document.getElementById('placevalue').required=false;
+                    document.getElementById('distancevalue').required=false;
+                }
+            }
+            else{
+                document.getElementById('hidden_div').style.display = "none";
+                document.getElementById('placevalue').required=false;
+                document.getElementById('distancevalue').required=false;
+            }
+        }
+        </script>
+    
+    </head>
+    <body>
+    <form>
+        <table>
+            <tr>
+                <td>Keyword</td><td><input type="text" id="keyword" name="keyword" required></input></td>
+            </tr>
+            <tr>
+                <td>Type:</td>
+                <td>
+                    <select name="type" onchange="showDiv(this)">
+                        <option value="users">Users</option>
+                        <option value="pages">Pages</option>
+                        <option value="events">Events</option>
+                        <option id="loc" value="places">Places</option>
+                        <option value="groups">Groups</option>
+                    </select>
+                </td>
+                <tr><td></td>
+                    <td><div id="hidden_div" style="display:none">Location<input type="text" name="places" id="placevalue"></input>Distance(meters)<input type="text" name="distance" id="distancevalue"></input></div></td>
+                </tr>
+            </tr>
+            <tr><td></td><td><input type="submit" value="Search"></input>
+                <input type="reset" value="Clear"></input></td></tr>
+            
+        </table>
+    </form>
+    </body>
+</html>
