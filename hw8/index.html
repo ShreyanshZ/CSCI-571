@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<a><title>FB Search</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/bootstrap.css">
+		<link rel="stylesheet" href="css/custom.css">
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.8/angular-animate.min.js"></script>
+		<script src="js/custom.js"></script>
+	</head>
+	<body>
+		<div ng-app="myApp" >
+		<div ng-controller="formCtrl">
+		<script>
+			getLocation();
+		</script>
+		<nav class="navbar navbar-default">
+		<div class="container" style="width:100%;">
+			<div class="container-fluid">
+				<a href="http://sample-env.shxpvrxwnm.us-west-2.elasticbeanstalk.com/"><div class="navbar-header brandWidth" ><div class="navbar-brand" style="color:#375A9E;">FB Search</div></div></a>
+				
+				<form class="navbar-form navbar-left form-inline formWidth" role="search" style="border-bottom:none; " ng-submit='abc(inputValue)'>
+					<div class="input-group" style="width:100%;">
+						<input type="text" class="form-control squareBorder" id="searchText" placeholder="type something..." ng-model="inputValue" required>
+						<span class="input-group-btn" style="width:10%;">
+							<button class="btn btn-secondary squareBorder buttonbg" type="submit" ><span class="glyphicon glyphicon-search iconWidth" style="color:white;"></span></button>
+						</span>
+						<span class="input-group-btn  keepSpace">
+							<button class="btn btn-secondary squareBorder clearButton" ng-click="clearText()" type="clear">Clear</button>
+						</span>
+					</div>
+				</form>
+			</div>
+		</div>
+		</nav>
+		
+		<ul class="nav nav-pills" style="width:100%;border-bottom:3px solid #375A9E;">
+			<li class="active col-md-2 noPadding squareBorder tabpill" ng-click="clickTab()">
+				<a href="#1b" data-toggle="tab" style="squareBorder" >Users</a>
+			</li>
+			<li class="col-md-2 noPadding squareBorder tabpill" ng-click="clickTab()">
+				<a href="#2b" data-toggle="tab" style="squareBorder">Pages</a>
+			</li>
+			<li class="col-md-2 noPadding squareBorder tabpill" ng-click="clickTab()">
+				<a href="#3b" data-toggle="tab" style="squareBorder">Events</a>
+			</li>
+			<li class="col-md-2 noPadding squareBorder tabpill" ng-click="clickTab()">
+				<a href="#4b" data-toggle="tab" style="squareBorder">Places</a>
+			</li>
+			<li class="col-md-2 noPadding squareBorder tabpill" ng-click="clickTab()">
+				<a href="#5b" data-toggle="tab" style="squareBorder">Groups</a>
+			</li>
+			<li class="col-md-2 noPadding squareBorder tabpill" ng-click="getFavourites();clickTab();">
+				<a href="#6b" data-toggle="tab" style="squareBorder">Favorites</a>
+			</li>
+		</ul>
+		
+		<div class="container" style="width:98%;">
+		
+		
+		<div class="container">
+		
+			<div id="fb-root"></div>
+			<script>
+			window.fbAsyncInit = function() {
+			FB.init({appId: '164458207397902', status: true, cookie: true,
+			xfbml: true});
+			};
+			(function() {
+			var e = document.createElement('script'); e.async = true;
+			e.src = document.location.protocol +
+			'//connect.facebook.net/en_US/all.js';
+			document.getElementById('fb-root').appendChild(e);
+			}());
+			</script>
+			<div id="one" class='animate-hide'  ng-hide="myValue"> 
+			<div class="container" style="width:100%;">
+			<div class="row" style="padding-bottom:10px;">
+			<div style="float:left;">
+				<button ng-click="myValue=true;showTable=true;" type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"  aria-hidden="true"></span>Back</button>
+			</div>
+		
+			
+			<div style="float:right;">
+			<button  id="shareBtn" class="btn btn-default btn-md"><img src="http://cs-server.usc.edu:45678/hw/hw8/images/facebook.png" style="width:15px;"/></button>
+				<script type="text/javascript">
+				var fbpicture="";
+				var fbname="";
+				document.getElementById('shareBtn').onclick = function() {
+				  FB.ui({
+					app_id:164458207397902,
+					method: 'feed',
+					display: 'popup',
+					link:window.location.href,
+					name:fbname,
+					picture: fbpicture,
+					caption: "FB Search from USC CSCI571",
+				  }, function(response){
+					  if (response && !response.error_message) 
+						alert("Posted Successfully");
+					else
+						alert("Not Posted");
+				  });
+				}
+				</script>
+			</div>	
+			<div style="float:right;" >
+			<button ng-if="checkStorage(details.id)==null" ng-click="addToLocal(details.id,details.name,details.picture.data.url,typeDetails)" class="btn btn-default btn-md text-right">
+										<span class="glyphicon glyphicon-star-empty"  aria-hidden="true"></span>
+									</button>
+			<button ng-if="checkStorage(details.id)!=null" ng-click="removeFromLocal(details.id)" class="btn btn-default btn-md text-right">
+							<span class="glyphicon glyphicon-star starShape"  aria-hidden="true"></span>
+			</button>
+			</div>
+			</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6">
+					<div  class="panel panel-default">
+					  <div class="panel-heading">Albums</div>
+					  
+					   <div class="panel-body" ng-hide="loadingDetails">
+					
+					
+						<div class="container" style="width:60%;padding-top:20%;">
+							<div class="progress">
+								<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
+									<span class="sr-only">45% Complete</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					  
+					  
+					  
+					  
+					  
+					  <div class="panel-body" ng-show="actualDetails">
+					  <div ng-if="details.albums.data" class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+						<div class="panel panel-default" ng-repeat="y in details.albums.data">
+						<div class="panel-heading" role="tab" id="heading{{y.id}}">
+						  <h4 class="panel-title">
+							<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#{{y.id}}" aria-expanded="false" aria-controls="#{{y.id}}">
+							{{y.name}}
+							</a>
+						  </h4>
+						</div>
+						<div id="{{y.id}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading{{y.id}}">
+						  <div ng-if="y.photos" class="panel-body">
+						  <div ng-repeat="z in y.photos.data">
+							  <a href="https://graph.facebook.com/v2.8/{{z.id}}/picture?access_token=EAACVkukISA4BAI06a1pzHwfM1FpoDUrOxpP3hA0jdv3dWmZA9M95GLSZC6lZARLMKhZCnIXRQlyvsQ710xV9LTHVqXeNcshB9PZA3zPV9qxHBZAPy0U2PX2Bkv60xLL2UadLTkXPZBGtd8ZAwj5gZCAdND7WHA2q0Eo4ZD" target="_blank">
+								<img style="border-radius:1%;width:100%;" ng-src="https://graph.facebook.com/v2.8/{{z.id}}/picture?access_token=EAACVkukISA4BAI06a1pzHwfM1FpoDUrOxpP3hA0jdv3dWmZA9M95GLSZC6lZARLMKhZCnIXRQlyvsQ710xV9LTHVqXeNcshB9PZA3zPV9qxHBZAPy0U2PX2Bkv60xLL2UadLTkXPZBGtd8ZAwj5gZCAdND7WHA2q0Eo4ZD"/>
+							  </a>
+						  </div>
+						  </div>
+						  <div ng-if="y.photos.data==null" ng-show="actualDetails">
+							<div class="alert alert-warning" role="alert">No data found.</div>
+						  </div>
+						</div>
+					  </div>
+					</div>
+					  <div ng-if="details.albums.data==null" ng-show="actualDetails">
+						<div class="alert alert-warning" role="alert">No data found.</div>
+					  </div>
+					  </div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="panel panel-default">
+					  <div class="panel-heading">Posts</div>
+					 
+					    <div class="panel-body" ng-hide="loadingDetails">
+					
+					
+						<div class="container" style="width:60%;padding-top:20%;">
+							<div class="progress">
+								<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
+									<span class="sr-only">45% Complete</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					  
+					  
+					  <div class="panel-body" ng-if="details.posts.data" ng-show="actualDetails">
+						<div class="panel panel-default" ng-repeat="a in details.posts.data">
+						  <div class="panel-body" >
+							<div class="media">
+							  <div class="media-left">
+								<a href="{{details.picture.data.url}}" target="_blank">
+								  <img class="media-object" src={{details.picture.data.url}} style="width:45px;height:auto;" alt="...">
+								</a>
+							  </div>
+							  <div class="media-body"><h4 class="media-heading">{{details.name}}</h4><small>{{a.created_time.split('T')[0]}}</small>&nbsp;&nbsp;&nbsp;<small>{{a.created_time.split('T')[1].split('+')[0]}}</small>
+							  </div>
+							</div>
+							<p style="margin-top:8px;">{{a.message}}</p>
+						  </div>
+						</div>
+					  
+					  
+					  
+					  
+					  </div>
+					  <div class="panel-body" ng-show="actualDetails" ng-if="details.posts.data==null">
+						<div class="alert alert-warning" role="alert">No data found.</div>
+					  </div>
+					  
+					  
+					  
+					</div>
+				</div>
+			</div>
+        </div>
+		</div>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<div class="tab-content clearfix">
+			<div class="tab-pane active" id="1b">
+				
+				
+				<div ng-show="loading">
+				<div class="container" style="width:60%;padding-top:20%;">
+					<div class="progress">
+						<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
+							<span class="sr-only">45% Complete</span>
+						</div>
+					</div>
+				</div>
+				</div>
+				<div class="table-responsive" ng-show="showTable">
+				<table class="table table-hover">
+					<div class="container">
+					<div class="row">
+						<thead>
+							<tr >
+								<th style="padding-top:30px;padding-bottom:15px;" class="col-md-1">#</th>
+								<th style="padding-top:30px;padding-bottom:15px;" class="col-md-2">Profile Photo</th>
+								<th style="padding-top:30px;padding-bottom:15px;" class="col-md-6">Name</th>
+								<th style="padding-top:30px;padding-bottom:15px;" class="col-md-2">Favourite</th>
+								<th style="padding-top:30px;padding-bottom:15px;" class="col-md-1">Details</th>
+							</tr>
+						</thead>
+					</div>
+						<tbody>
+						
+							<tr ng-repeat="x in users">
+							<div class="row">
+								<td style="vertical-align:middle;" class="col-md-1">{{$index + 1}}</td>
+								<td class="col-md-2"><a ng-if="x.picture.url" href="{{x.picture.url}}" target="_blank"><img ng-src="{{x.picture.url}}" class="img-circle"/></a><a ng-if="x.picture.data.url" href="{{x.picture.data.url}}" target="_blank"><img ng-src="{{x.picture.data.url}}" class="img-circle"/></a></td>
+								<td style="vertical-align:middle;" class="col-md-6">{{x.name}}</td>
+								<td style="vertical-align:middle;" class="col-md-2">
+									<button type="checkbox" ng-if="checkStorage(x.id)==null && x.picture.url" ng-click="addToLocal(x.id,x.name,x.picture.url,'users')" class="btn btn-default btn-md">
+										<span class="glyphicon glyphicon-star-empty"  aria-hidden="true"></span>
+									</button>
+									<button type="checkbox" ng-if="checkStorage(x.id)==null && x.picture.data.url" ng-click="addToLocal(x.id,x.name,x.picture.data.url,'users')" class="btn btn-default btn-md">
+										<span class="glyphicon glyphicon-star-empty"  aria-hidden="true"></span>
+									</button>
+									<button type="checkbox" ng-if="checkStorage(x.id)!=null" ng-click="removeFromLocal(x.id)" class="btn btn-default btn-md">
+										<span class="glyphicon glyphicon-star starShape"  aria-hidden="true"></span>
+									</button>
+								</td>
+								<td style="vertical-align:middle;" class="col-md-1">
+									<button ng-if="x.picture.data.url" ng-click="slideRight(x.id,x.picture.data.url,x.name,'users');" class="btn btn-default btn-md">
+										<span class="glyphicon glyphicon-chevron-right"  aria-hidden="true"></span>
+									</button>
+									<button ng-if="x.picture.url" ng-click="slideRight(x.id,x.picture.url,x.name,'users');" class="btn btn-default btn-md">
+										<span class="glyphicon glyphicon-chevron-right"  aria-hidden="true"></span>
+									</button>
+								</td>
+							</div>
+		
+							</tr>
+												
+						</tbody>
+						
+					</div>
+				</table>
+				<nav aria-label="...">
+				  <ul class="pager">
+					<span ng-if="userpaging.paging.previous"><li><button ng-click="nextUsers(userpaging.paging.previous)" class="btn btn-default btn-md">Previous</button></li></span>
+					<span ng-if="userpaging.paging.next"><li><button ng-click="nextUsers(userpaging.paging.next)" class="btn btn-default btn-md">Next</button></li></span>
+				  </ul>
+				</nav>
+
+				</div>
+						
+						
+				
+
+				
+
+			</div>
+			<div class="tab-pane" id="2b">
+				<div ng-show="loading">
+				<div class="container" style="width:60%;padding-top:20%;">
+					<div class="progress">
+						<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
+							<span class="sr-only">45% Complete</span>
+						</div>
+					</div>
+				</div>
+				</div>
+				<div class="table-responsive" ng-show="showTable">
+					<table class="table table-hover">
+						<div class="container">
+							<div class="row">
+								<thead ng-show="showDetails">
+									<tr >
+										<th style="padding-top:30px;padding-bottom:15px;" class="col-md-1">#</th>
+										<th style="padding-top:30px;padding-bottom:15px;" class="col-md-2">Profile Photo</th>
+										<th style="padding-top:30px;padding-bottom:15px;" class="col-md-6">Name</th>
+										<th style="padding-top:30px;padding-bottom:15px;" class="col-md-2">Favourite</th>
+										<th style="padding-top:30px;padding-bottom:15px;" class="col-md-1">Details</th>
+									</tr>
+								</thead>
+							</div>
+							<tbody>
+								<tr ng-repeat="x in pages">
+									<div class="row">
+										<td style="vertical-align:middle;" class="col-md-1">{{$index + 1}}</td>
+										<td class="col-md-2"><a ng-if="x.picture.url" href="{{x.picture.url}}" target="_blank"><img ng-src="{{x.picture.url}}" class="img-circle"/></a><a ng-if="x.picture.data.url" href="{{x.picture.data.url}}" target="_blank"><img ng-src="{{x.picture.data.url}}" class="img-circle"/></a></td>
+										<td style="vertical-align:middle;" class="col-md-6">{{x.name}}</td>
+										<td style="vertical-align:middle;" class="col-md-2">
+											<button type="checkbox" ng-if="checkStorage(x.id)==null && x.picture.url" ng-click="addToLocal(x.id,x.name,x.picture.url,'pages')" class="btn btn-default btn-md">
+												<span class="glyphicon glyphicon-star-empty"  aria-hidden="true"></span>
+											</button>
+											<button type="checkbox" ng-if="checkStorage(x.id)==null && x.picture.data.url" ng-click="addToLocal(x.id,x.name,x.picture.data.url,'pages')" class="btn btn-default btn-md">
+												<span class="glyphicon glyphicon-star-empty"  aria-hidden="true"></span>
+											</button>
+											<button type="checkbox" ng-if="checkStorage(x.id)!=null" ng-click="removeFromLocal(x.id)" class="btn btn-default btn-md">
+												<span class="glyphicon glyphicon-star starShape"  aria-hidden="true"></span>
+											</button>
+										</td>
+										<td style="vertical-align:middle;" class="col-md-1">
+											<button ng-if="x.picture.data.url" ng-click="slideRight(x.id,x.picture.data.url,x.name,'pages');" class="btn btn-default btn-md">
+												<span class="glyphicon glyphicon-chevron-right"  aria-hidden="true"></span>
+											</button>
+											<button ng-if="x.picture.url" ng-click="slideRight(x.id,x.picture.url,x.name,'pages');" class="btn btn-default btn-md">
+												<span class="glyphicon glyphicon-chevron-right"  aria-hidden="true"></span>
+											</button>
+										</td>
+									</div>
+								</tr>		
+							</tbody>
+						</div>
+					</table>
+					<nav aria-label="...">
+						<ul class="pager">
+							<span ng-if="pagepaging.paging.previous"><li><button ng-click="nextPages(pagepaging.paging.previous)" class="btn btn-default btn-md">Previous</button></li></span>
+							<span ng-if="pagepaging.paging.next"><li><button ng-click="nextPages(pagepaging.paging.next)" class="btn btn-default btn-md">Next</button></li></span>
+						</ul>
+					</nav>
+				</div>
+			</div>
+			<div class="tab-pane" id="3b">
+				<div ng-show="loading">
+				<div class="container" style="width:60%;padding-top:20%;">
+					<div class="progress">
+						<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
+							<span class="sr-only">45% Complete</span>
+						</div>
+					</div>
+				</div>
+				</div>
+				<div class="table-responsive" ng-show="showTable">
+					<table class="table table-hover">
+						<div class="container">
+							<div class="row">
+								<thead ng-show="showDetails">
+									<tr >
+										<th style="padding-top:30px;padding-bottom:15px;" class="col-md-1">#</th>
+										<th style="padding-top:30px;padding-bottom:15px;" class="col-md-2">Profile Photo</th>
+										<th style="padding-top:30px;padding-bottom:15px;" class="col-md-6">Name</th>
+										<th style="padding-top:30px;padding-bottom:15px;" class="col-md-2">Favourite</th>
+										<th style="padding-top:30px;padding-bottom:15px;" class="col-md-1">Details</th>
+									</tr>
+								</thead>
+							</div>
+							<tbody>
+								<tr ng-repeat="x in events">
+									<div class="row">
+										<td style="vertical-align:middle;" class="col-md-1">{{$index + 1}}</td>
+										<td class="col-md-2"><a ng-if="x.picture.url" href="{{x.picture.url}}" target="_blank"><img ng-src="{{x.picture.url}}" class="img-circle"/></a><a ng-if="x.picture.data.url" href="{{x.picture.data.url}}" target="_blank"><img ng-src="{{x.picture.data.url}}" class="img-circle"/></a></td>
+										<td style="vertical-align:middle;" class="col-md-6">{{x.name}}</td>
+										<td style="vertical-align:middle;" class="col-md-2">
+											<button type="checkbox" ng-if="checkStorage(x.id)==null && x.picture.url" ng-click="addToLocal(x.id,x.name,x.picture.url,'events')" class="btn btn-default btn-md">
+												<span class="glyphicon glyphicon-star-empty"  aria-hidden="true"></span>
+											</button>
+											<button type="checkbox" ng-if="checkStorage(x.id)==null && x.picture.data.url" ng-click="addToLocal(x.id,x.name,x.picture.data.url,'events')" class="btn btn-default btn-md">
+												<span class="glyphicon glyphicon-star-empty"  aria-hidden="true"></span>
+											</button>
+											<button type="checkbox" ng-if="checkStorage(x.id)!=null" ng-click="removeFromLocal(x.id)" class="btn btn-default btn-md">
+												<span class="glyphicon glyphicon-star starShape"  aria-hidden="true"></span>
+											</button>
+										</td>
+										<td style="vertical-align:middle;" class="col-md-1">
+											<button ng-if="x.picture.data.url" ng-click="slideRight(x.id,x.picture.data.url,x.name,'events');" class="btn btn-default btn-md">
+												<span class="glyphicon glyphicon-chevron-right"  aria-hidden="true"></span>
+											</button>
+											<button ng-if="x.picture.url" ng-click="slideRight(x.id,x.picture.url,x.name,'events');" class="btn btn-default btn-md">
+												<span class="glyphicon glyphicon-chevron-right"  aria-hidden="true"></span>
+											</button>
+										</td>
+									</div>
+								</tr>		
+							</tbody>
+						</div>
+					</table>
+					<nav aria-label="...">
+						<ul class="pager">
+							<span ng-if="eventpaging.paging.previous"><li><button ng-click="nextEvents(eventpaging.paging.previous)" class="btn btn-default btn-md">Previous</button></li></span>
+							<span ng-if="eventpaging.paging.next"><li><button ng-click="nextEvents(eventpaging.paging.next)" class="btn btn-default btn-md">Next</button></li></span>
+						</ul>
+					</nav>
+				</div>
+			</div>
+			<div class="tab-pane" id="4b">
+				<div ng-show="loading">
+				<div class="container" style="width:60%;padding-top:20%;">
+					<div class="progress">
+						<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
+							<span class="sr-only">45% Complete</span>
+						</div>
+					</div>
+				</div>
+				</div>
+				<div class="table-responsive" ng-show="showTable">
+					<table class="table table-hover">
+						<div class="container">
+						<div class="row">
+							<thead ng-show="showDetails">
+								<tr >
+									<th style="padding-top:30px;padding-bottom:15px;" class="col-md-1">#</th>
+									<th style="padding-top:30px;padding-bottom:15px;" class="col-md-2">Profile Photo</th>
+									<th style="padding-top:30px;padding-bottom:15px;" class="col-md-6">Name</th>
+									<th style="padding-top:30px;padding-bottom:15px;" class="col-md-2">Favourite</th>
+									<th style="padding-top:30px;padding-bottom:15px;" class="col-md-1">Details</th>
+								</tr>
+							</thead>
+						</div>
+							<tbody>
+								<tr ng-repeat="x in places">
+									<div class="row">
+										<td style="vertical-align:middle;" class="col-md-1">{{$index + 1}}</td>
+										<td class="col-md-2"><a ng-if="x.picture.url" href="{{x.picture.url}}" target="_blank"><img ng-src="{{x.picture.url}}" class="img-circle"/></a><a ng-if="x.picture.data.url" href="{{x.picture.data.url}}" target="_blank"><img ng-src="{{x.picture.data.url}}" class="img-circle"/></a></td>
+										<td style="vertical-align:middle;" class="col-md-6">{{x.name}}</td>
+										<td style="vertical-align:middle;" class="col-md-2">
+											<button type="checkbox" ng-if="checkStorage(x.id)==null && x.picture.url" ng-click="addToLocal(x.id,x.name,x.picture.url,'places')" class="btn btn-default btn-md">
+												<span class="glyphicon glyphicon-star-empty"  aria-hidden="true"></span>
+											</button>
+											<button type="checkbox" ng-if="checkStorage(x.id)==null && x.picture.data.url" ng-click="addToLocal(x.id,x.name,x.picture.data.url,'places')" class="btn btn-default btn-md">
+												<span class="glyphicon glyphicon-star-empty"  aria-hidden="true"></span>
+											</button>
+											<button type="checkbox" ng-if="checkStorage(x.id)!=null" ng-click="removeFromLocal(x.id)" class="btn btn-default btn-md">
+												<span class="glyphicon glyphicon-star starShape"  aria-hidden="true"></span>
+											</button>
+										</td>
+										<td style="vertical-align:middle;" class="col-md-1">
+											<button ng-if="x.picture.data.url" ng-click="slideRight(x.id,x.picture.data.url,x.name,'places');" class="btn btn-default btn-md">
+												<span class="glyphicon glyphicon-chevron-right"  aria-hidden="true"></span>
+											</button>
+											<button ng-if="x.picture.url" ng-click="slideRight(x.id,x.picture.url,x.name,'places');" class="btn btn-default btn-md">
+												<span class="glyphicon glyphicon-chevron-right"  aria-hidden="true"></span>
+											</button>
+										</td>
+									</div>
+								</tr>		
+							</tbody>
+						</div>
+					</table>
+					<nav aria-label="...">
+						<ul class="pager">
+							<span ng-if="placepaging.paging.previous"><li><button ng-click="nextPlaces(placepaging.paging.previous)" class="btn btn-default btn-md">Previous</button></li></span>
+							<span ng-if="placepaging.paging.next"><li><button ng-click="nextPlaces(placepaging.paging.next)" class="btn btn-default btn-md">Next</button></li></span>
+						</ul>
+					</nav>
+				</div>
+			</div>
+			
+			
+			<div class="tab-pane" id="5b">
+				<div ng-show="loading">
+				<div class="container" style="width:60%;padding-top:20%;">
+					<div class="progress">
+						<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
+							<span class="sr-only">45% Complete</span>
+						</div>
+					</div>
+				</div>
+				</div>
+				<div class="table-responsive" ng-show="showTable">
+					<table class="table table-hover">
+						<div class="container">
+						<div class="row">
+							<thead ng-show="showDetails">
+								<tr >
+									<th style="padding-top:30px;padding-bottom:15px;" class="col-md-1">#</th>
+									<th style="padding-top:30px;padding-bottom:15px;" class="col-md-2">Profile Photo</th>
+									<th style="padding-top:30px;padding-bottom:15px;" class="col-md-6">Name</th>
+									<th style="padding-top:30px;padding-bottom:15px;" class="col-md-2">Favourite</th>
+									<th style="padding-top:30px;padding-bottom:15px;" class="col-md-1">Details</th>
+								</tr>
+							</thead>
+						</div>
+							<tbody>
+								<tr ng-repeat="x in groups">
+									<div class="row">
+										<td style="vertical-align:middle;" class="col-md-1">{{$index + 1}}</td>
+										<td class="col-md-2"><a ng-if="x.picture.url" href="{{x.picture.url}}" target="_blank"><img ng-src="{{x.picture.url}}" class="img-circle"/></a><a ng-if="x.picture.data.url" href="{{x.picture.data.url}}" target="_blank"><img ng-src="{{x.picture.data.url}}" class="img-circle"/></a></td>
+										<td style="vertical-align:middle;" class="col-md-6">{{x.name}}</td>
+										<td style="vertical-align:middle;" class="col-md-2">
+											<button type="checkbox" ng-if="checkStorage(x.id)==null && x.picture.url" ng-click="addToLocal(x.id,x.name,x.picture.url,'groups')" class="btn btn-default btn-md">
+												<span class="glyphicon glyphicon-star-empty"  aria-hidden="true"></span>
+											</button>
+											<button type="checkbox" ng-if="checkStorage(x.id)==null && x.picture.data.url" ng-click="addToLocal(x.id,x.name,x.picture.data.url,'groups')" class="btn btn-default btn-md">
+												<span class="glyphicon glyphicon-star-empty"  aria-hidden="true"></span>
+											</button>
+											<button type="checkbox" ng-if="checkStorage(x.id)!=null" ng-click="removeFromLocal(x.id)" class="btn btn-default btn-md">
+												<span class="glyphicon glyphicon-star starShape"  aria-hidden="true"></span>
+											</button>
+										</td>
+										<td style="vertical-align:middle;" class="col-md-1">
+											<button ng-if="x.picture.data.url" ng-click="slideRight(x.id,x.picture.data.url,x.name,'groups');" class="btn btn-default btn-md">
+												<span class="glyphicon glyphicon-chevron-right"  aria-hidden="true"></span>
+											</button>
+											<button ng-if="x.picture.url" ng-click="slideRight(x.id,x.picture.url,x.name,'groups');" class="btn btn-default btn-md">
+												<span class="glyphicon glyphicon-chevron-right"  aria-hidden="true"></span>
+											</button>
+										</td>
+									</div>
+								</tr>		
+							</tbody>
+						</div>
+					</table>
+					<nav aria-label="...">
+						<ul class="pager">
+							<span ng-if="grouppaging.paging.previous"><li><button ng-click="nextGroups(grouppaging.paging.previous)" class="btn btn-default btn-md">Previous</button></li></span>
+							<span ng-if="grouppaging.paging.next"><li><button ng-click="nextGroups(grouppaging.paging.next)" class="btn btn-default btn-md">Next</button></li></span>
+						</ul>
+					</nav>
+				</div>
+			</div>
+			
+			<div class="tab-pane" id="6b">
+				<div ng-show="loading">
+					<div class="container" style="width:60%;padding-top:20%;">
+						<div class="progress">
+							<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
+								<span class="sr-only">45% Complete</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="table-responsive" ng-show="showTable">
+					<table class="table table-hover">
+						<div class="container">
+						<div class="row">
+						<div ng-if='favourites.length> 1'>
+							<thead>
+								<tr >
+									<th style="padding-top:30px;padding-bottom:15px;" class="col-md-1">#</th>
+									<th style="padding-top:30px;padding-bottom:15px;" class="col-md-2">Profile Photo</th>
+									<th style="padding-top:30px;padding-bottom:15px;" class="col-md-5">Name</th>
+									<th style="padding-top:30px;padding-bottom:15px;" class="col-md-1">Type</th>
+									<th style="padding-top:30px;padding-bottom:15px;" class="col-md-2">Favourite</th>
+									<th style="padding-top:30px;padding-bottom:15px;" class="col-md-1">Details</th>
+								</tr>
+							</thead>
+							</div>
+						</div>
+							<tbody>
+								<tr ng-repeat="(key,value) in favourites">
+									<div class="row">
+										<td style="vertical-align:middle;" class="col-md-1">{{$index + 1}}</td>
+										<td class="col-md-2">
+											<a href="{{value.picture}}" target="_blank"><img ng-src="{{value.picture}}" class="img-circle"/></a>
+										</td>
+										<td style="vertical-align:middle;" class="col-md-5">{{value.name}}</td>
+										<td style="vertical-align:middle;" class="col-md-1">{{value.type}}</td>
+										<td style="vertical-align:middle;" class="col-md-2">
+											<button type="checkbox" ng-click="removeFromLocal(key)" class="btn btn-default btn-md">
+												<span class="glyphicon glyphicon-trash"  aria-hidden="true"></span>
+											</button>
+										</td>
+										<td style="vertical-align:middle;" class="col-md-1">
+											<button ng-click="slideRight(key,value.picture,value.name,value.type);" class="btn btn-default btn-md">
+												<span class="glyphicon glyphicon-chevron-right"  aria-hidden="true"></span>
+											</button>
+										</td>
+									</div>
+								</tr>		
+							</tbody>
+						</div>
+					</table>
+				</div>
+			</div>
+		</div>
+		</div>
+		</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,180 @@
+.squareBorder{
+	border-radius:0px;
+}
+
+@media (min-width: 768px) {
+	.brandWidth{
+		width:30%;
+	}
+	.formWidth{
+		width:50%;
+	}
+	.iconWidth{
+		width:60px;
+		
+	}	
+	.tabpill{
+		width:16.66%;
+		text-align:center;
+		font-size:17px;
+		line-height:28px;
+	}
+}
+
+.keepSpace{
+		padding-left:20px;
+	}
+	
+.buttonbg{
+	background:#375A9E;
+}
+
+.clearButton{
+	border-color:#375A9E;
+	color:#375A9E;
+	background:white;
+}
+
+.noPadding{
+	padding-left:0px;
+	padding-right:0px;
+}
+
+
+@media (max-width: 768px) {
+	.col-md-2{
+		width:100%;
+		text-align:center;
+		font-size:12px;
+		line-height:12px;
+	}
+	
+	.smallnav{
+		style="width:96%;
+		margin-left:2%;"
+	}
+}
+
+
+.img-circle{
+	border-radius:50%;
+	width:50px;
+	height:50px;
+	float:left;
+}
+
+.starShape{
+	color:yellow !important;
+}
+
+.normalStar{
+	color:white !important;
+}
+
+.btn-default:active{
+	background:white;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.animate-hide {
+ -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.7s;
+    -moz-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.7s;
+    -o-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.7s;
+    transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.7s;
+  line-height:20px;
+  opacity:1;
+  padding:10px;
+  /*border:1px solid black;*/
+  background:white;
+  position: absolute;
+  width:96%;
+  margin:auto;
+  left: 1%;
+}
+
+.animate-hide.ng-hide {
+  left: -100%;
+  opacity:0;
+  padding:0 10px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+input[type='checkbox'].tags-checkbox:checked + label > i:first-of-type,
+input[type='checkbox'].tags-checkbox + label > i:last-of-type{
+    display: none;
+}
+input[type='checkbox'].tags-checkbox:checked + label > i:last-of-type{
+    display: inline-block;
+}
+
+/*the second method - much cleaner look: Using 2 :pseudo classes from predefined bootstrap icons*/
+input[type='checkbox'].pseudo-checkbox + label:before,
+input[type='checkbox'].pseudo-checkbox + label:after{
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    font-family: 'Glyphicons Halflings';
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+input[type='checkbox'].pseudo-checkbox + label:before{/*unchecked icon*/
+    content: "\e157";
+}
+input[type='checkbox']:checked.pseudo-checkbox + label:before{/*checked icon*/
+    content: "\e067";
+}
